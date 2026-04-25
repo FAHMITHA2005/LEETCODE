@@ -1,0 +1,47 @@
+class Solution:
+    def maxDistance(self, side: int, points: list[list[int]], k: int) -> int:
+        
+        # Manhattan distance
+        def dist(p1, p2):
+            return abs(p1[0] - p2[0]) + abs(p1[1] - p2[1])
+        
+        n = len(points)
+        
+        # Check if we can pick k points with min distance >= d
+        def can(d):
+            selected = []
+            
+            def backtrack(start):
+                if len(selected) == k:
+                    return True
+                
+                for i in range(start, n):
+                    ok = True
+                    for p in selected:
+                        if dist(p, points[i]) < d:
+                            ok = False
+                            break
+                    
+                    if ok:
+                        selected.append(points[i])
+                        if backtrack(i + 1):
+                            return True
+                        selected.pop()
+                
+                return False
+            
+            return backtrack(0)
+        
+        # Binary search
+        left, right = 0, 2 * side
+        ans = 0
+        
+        while left <= right:
+            mid = (left + right) // 2
+            if can(mid):
+                ans = mid
+                left = mid + 1
+            else:
+                right = mid - 1
+        
+        return ans
